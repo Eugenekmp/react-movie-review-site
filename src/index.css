@@ -1,0 +1,8 @@
+:root {
+  --z-index-modal: 1000;
+}
+
+body {
+  margin: 0;
+  background-color: #e5e5e5;
+}
