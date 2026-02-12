@@ -1,20 +1,21 @@
-import { useState } from "react";
-import Modal from "./Modal";
-import styles from "./ReviewListItem.module.css";
-import ReviewForm from "./ReviewForm.jsx";
-import Button from "./Button.jsx";
-import placeholderImage from "../assets/placeholder.png";
+import { useState } from 'react';
+import Modal from './Modal';
+import ReviewForm from './ReviewForm';
+import Button from './Button';
+import placeholderImage from '../assets/placeholder.png';
+import formatDate from '../utils/formatDate';
+import styles from './ReviewListItem.module.css';
 
-const STARS = "★★★★★";
+const STARS = '★★★★★';
 
-function ReviewListItem({ item, onDelete, onUpdate }) {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const dateString = new Date(item.createdAt).toLocaleDateString();
+function ReviewListItem({ item, onUpdate, onDelete }) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState();
 
   const handleEditFormSubmit = (data) => {
     onUpdate(item.id, data);
     setIsEditModalOpen(false);
   };
+
   return (
     <div className={styles.reviewListItem}>
       <img
@@ -23,13 +24,13 @@ function ReviewListItem({ item, onDelete, onUpdate }) {
         alt={item.title}
       />
       <div className={styles.rows}>
-        <h1 className={styles.title}>{item.title}</h1>
+        <h2 className={styles.title}>{item.title}</h2>
         <p className={styles.rating}>{STARS.slice(0, item.rating)}</p>
-        <p className={styles.date}>{dateString}</p>
+        <p className={styles.date}>{formatDate(item.createdAt)}</p>
         <p className={styles.content}>{item.content}</p>
         <div>
           <Button
-            classsName={styles.button}
+            className={styles.button}
             variant="ghost"
             onClick={() => setIsEditModalOpen(true)}
           >

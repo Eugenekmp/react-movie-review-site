@@ -1,0 +1,56 @@
+.reviewListItem {
+  display: flex;
+  align-items: center;
+}
+
+.image {
+  width: 182px;
+  height: 262px;
+  margin-right: 20px;
+  border-radius: 0 15px 0 15px;
+  object-fit: cover;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 22px 0 18px;
+  overflow: hidden;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+.rating {
+  margin-bottom: 8px;
+}
+
+.date {
+  margin: 0 0 19px;
+  color: #bdbdbd;
+  font-size: 14px;
+  letter-spacing: -0.25px;
+}
+
+.content {
+  display: -webkit-box;
+  flex: 1 1;
+  margin: 0 0 53px;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  color: #545357;
+  font-size: 16px;
+  line-height: 1.63;
+  letter-spacing: -0.2px;
+}
+
+.modalTitle {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
