@@ -6,8 +6,10 @@ import ReviewForm from "./components/ReviewForm.jsx";
 import Button from "./components/Button.jsx";
 import Layout from "./components/Layout.jsx";
 import styles from "./App.module.css";
+import useTranslate from "./hooks/useTranslate.js";
 
 function App() {
+  const t = useTranslate();
   const [items, setItems] = useState(mockItems);
   const [order, setOrder] = useState("createdAt");
   const [isCreatedReviewOpen, setIsCreatedReviewOpen] = useState(false);
@@ -57,27 +59,27 @@ function App() {
             variant={order === "createdAt" ? "primary" : "ghost"}
             onClick={() => setOrder("createdAt")}
           >
-            최신순
+            {t("sort by latest")}
           </Button>
           <Button
             className={styles.orderButton}
             variant={order === "rating" ? "primary" : "ghost"}
             onClick={() => setOrder("rating")}
           >
-            베스트순
+            {t("sort by best")}
           </Button>
         </div>
         <Button
           className={styles.createButton}
           onClick={() => setIsCreatedReviewOpen(true)}
         >
-          추가하기
+          {t("create button")}
         </Button>
         <Modal
           isOpen={isCreatedReviewOpen}
           onClose={() => setIsCreatedReviewOpen(false)}
         >
-          <h2 className={styles.modalTitle}>리뷰 생성</h2>
+          <h2 className={styles.modalTitle}>{t("create review title")}</h2>
           <ReviewForm onSubmit={handleCreate} />
         </Modal>
       </div>

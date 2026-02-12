@@ -1,5 +1,6 @@
 import logoImage from "../assets/logo.png";
 import styles from "./Layout.module.css";
+import LocaleSelect from "./LocaleSelect";
 
 function Layout({ children }) {
   return (
@@ -7,6 +8,7 @@ function Layout({ children }) {
       <div className={styles.gnbContainer}>
         <div className={styles.gnb}>
           <img src={logoImage} alt="moviepedia" />
+          <LocaleSelect />
         </div>
       </div>
       <div className={styles.main}>{children}</div>
