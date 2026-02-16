@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useActionState } from "react";
 import Button from "./Button.jsx";
 import Input from "./Input.jsx";
 import Select from "./Select.jsx";
 import Textarea from "./Textarea.jsx";
-import placeholderImg from "../assets/placeholder.png";
 import styles from "./ReviewForm.module.css";
 import useTranslate from "../hooks/useTranslate.js";
+import FileInput from "./FileInput.jsx";
 
 function ReviewForm({
   review = {
@@ -20,10 +20,17 @@ function ReviewForm({
 
   const inputRef = useRef(null);
 
-  const submit = (formData) => {
-    const data = Object.fromEntries(formData.entries());
-    onSubmit(data);
-  };
+  const [state, formAction, isPending] = useActionState(
+    async (prevState, data) => {
+      try {
+        await onSubmit(data);
+        return { error: null };
+      } catch (error) {
+        return { error };
+      }
+    },
+    { error: null },
+  );
 
   useEffect(() => {
     if (inputRef.current) {
@@ -32,8 +39,8 @@ function ReviewForm({
   }, []);
 
   return (
-    <form className={styles.form} action={submit}>
-      <img src={placeholderImg} />
+    <form className={styles.form} action={formAction}>
+      <FileInput name="imgFile" initialPreview={review.imgUrl} />
       <div className={styles.content}>
         <div className={styles.titleRating}>
           <Input
@@ -57,7 +64,10 @@ function ReviewForm({
           placeholder={t("review content placeholder")}
           defaultValue={review.content}
         />
-        <Button className={styles.button}>{t("submit button")}</Button>
+        <Button disabled={isPending} className={styles.button}>
+          {t("submit button")}
+        </Button>
+        {state.error && <div>오류가 발생했습니다.</div>}
       </div>
     </form>
   );

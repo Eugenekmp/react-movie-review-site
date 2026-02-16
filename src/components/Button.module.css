@@ -11,6 +11,10 @@
   padding: 13px 40px;
 }
 
+.primary:disabled {
+  background-color: #999999;
+}
+
 .ghost {
   background-color: transparent;
   font-size: 16px;

@@ -1,54 +1,91 @@
 import ReviewList from "./components/ReviewList";
-import mockItems from "./mock.json";
-import { useState } from "react";
+
+import { useCallback, useEffect, useState } from "react";
 import Modal from "./components/Modal";
 import ReviewForm from "./components/ReviewForm.jsx";
 import Button from "./components/Button.jsx";
 import Layout from "./components/Layout.jsx";
 import styles from "./App.module.css";
 import useTranslate from "./hooks/useTranslate.js";
+import axios from "./utils/axios";
+
+const LIMIT = 10;
 
 function App() {
   const t = useTranslate();
-  const [items, setItems] = useState(mockItems);
+  const [items, setItems] = useState([]);
   const [order, setOrder] = useState("createdAt");
   const [isCreatedReviewOpen, setIsCreatedReviewOpen] = useState(false);
+  const [hasNext, setHasNext] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleUpdate = (id, data) => {
-    const index = items.findIndex((item) => item.id === id);
-    const now = new Date();
-    const newItem = {
-      ...items[index],
-      ...data,
-      updatedAt: now.valueOf(),
-    };
+  const handleLoad = useCallback(async (orderParam) => {
+    const response = await axios.get("/film-reviews", {
+      params: {
+        order: orderParam,
+        limit: LIMIT,
+      },
+    });
+    const { reviews, paging } = response.data;
+    setItems(reviews);
+    setHasNext(paging.hasNext);
+  }, []);
 
-    const newItems = [
-      ...items.slice(0, index),
-      newItem,
-      ...items.slice(index + 1),
-    ];
-    setItems(newItems);
+  const handleLoadMore = async () => {
+    let data = null;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get("/film-reviews", {
+        params: {
+          order,
+          offset: items.length,
+          limit: LIMIT,
+        },
+      });
+      data = response.data;
+    } catch (error) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
+    if (!data) return;
+
+    const { reviews, paging } = data;
+    setItems((prevItems) => [...prevItems, ...reviews]);
+    setHasNext(paging.hasNext);
   };
 
-  const handleCreate = (data) => {
-    const now = new Date();
-    const newItem = {
-      id: items.length + 1,
-      ...data,
-      createdAt: now.valueOf(),
-      updatedAt: now.valueOf(),
-    };
-    setItems([newItem, ...items]);
+  const handleUpdate = async (id, data) => {
+    const response = await axios.patch(`/film-reviews/${id}`, data);
+    const { review } = response.data;
+
+    setItems((prevItems) => {
+      const index = prevItems.findIndex((item) => item.id === id);
+      return [
+        ...prevItems.slice(0, index),
+        review,
+        ...prevItems.slice(index + 1),
+      ];
+    });
+  };
+
+  const handleCreate = async (data) => {
+    const response = await axios.post("/film-reviews ", data);
+    const { review } = response.data;
+
+    setItems((prevItems) => [review, ...prevItems]);
     setIsCreatedReviewOpen(false);
   };
 
-  const sortedItems = items.sort((a, b) => b[order] - a[order]);
-
-  const handleDelete = (id) => {
-    const nextItems = items.filter((items) => items.id !== id);
-    setItems(nextItems);
+  const handleDelete = async (id) => {
+    await axios.delete(`/film-reviews/${id}`);
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
+  useEffect(() => {
+    handleLoad(order);
+  }, [order, handleLoad]);
 
   return (
     <Layout>
@@ -84,10 +121,16 @@ function App() {
         </Modal>
       </div>
       <ReviewList
-        items={sortedItems}
+        items={items}
         onDelete={handleDelete}
         onUpdate={handleUpdate}
       />
+      {hasNext && (
+        <Button disabled={isLoading} onClick={handleLoadMore}>
+          더 불러오기
+        </Button>
+      )}
+      {error && <div>오류가 발생했습니다.</div>}
     </Layout>
   );
 }
